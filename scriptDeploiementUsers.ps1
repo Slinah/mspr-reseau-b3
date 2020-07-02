@@ -1,8 +1,8 @@
 # ~~~~~~ Variables ~~~~~~
 
-$csv = import-csv 'Utilisateurs.csv' -Delimiter ';'
-$agences = import-csv 'Utilisateurs.csv' -Delimiter ';' | Sort-Object Agence -Unique | % {$_.Agence}
-$services = import-csv 'Utilisateurs.csv' -Delimiter ';' | % {$_.Service, $_.Agence}
+$csv = Import-csv 'Utilisateurs.csv' -Delimiter ';'
+$agences = Import-csv 'Utilisateurs.csv' -Delimiter ';' | Sort-Object Agence -Unique | % {$_.Agence}
+$services = Import-csv 'Utilisateurs.csv' -Delimiter ';' | % {$_.Service, $_.Agence}
 
 $domaineDNS = "XXXXXX.lan"
 $netBIOS = "XXXXXX"
@@ -26,17 +26,27 @@ $p = "XXXXXXDefaultPassword"
 
 # ~~~~~~ Configuration Machine  ~~~~~~
 
-new-netipAddress -ipaddress $ADIP -prefixlength $mask -interfaceindex (get-netadapter).ifindex -defaultgateway $defaultgateway
+New-NetIpAddress -ipaddress $ADIP -prefixlength $mask -interfaceindex (Get-NetAdapter).ifindex -defaultgateway $defaultgateway
+
 set-dnsclientserveraddress -interfaceindex (get-netadapter).ifindex -serveraddresses("127.0.0.1")
+
 rename-computer -newname "ServerAD"
 rename-netadapter -name Ethernet0 -newname LAN 
 
+import-module ADDSDeployment
+import-module ActiveDirectory
+import-module 'Microsoft.Powershell.Security'
+
 # ~~~~~~ Installation DNS, DHCP, AD ~~~~~~
+
+# Install-WindowsFeature DNS -IncludeManagementTools
+# Install-WindowsFeature DHCP -IncludeManagementTools
+# Install-WindowsFeature AD-Domain-Services -IncludeManagementTools
 
 ForEach ($function in $DNS){
     if ((( Get-WindowsFeature -name $function).installstate) -eq "Available"){
         try {
-            Add-WindowsFeature -name $function -includemanagementtools -includeallsubfeature
+            Install-WindowsFeature -name $function -includemanagementtools -includeallsubfeature
         }catch{
             write-output "$function : L'installation a plantée."
         }
@@ -47,14 +57,11 @@ ForEach ($function in $DNS){
 
 #  ~~~~~~ Configuration DHCP ~~~~~~
 
-Add-DhcpServerv4Scope -Name "Paris-Administratif" -StartRange 192.168.20.1 -EndRange 192.168.20.126 -SubnetMask 255.255.255.0 
+Add-DhcpServerv4Scope -Name "Paris-Administratif" -StartRange 192.168.20.1 -EndRange 192.168.20.126 -SubnetMask 255.255.255.0 -State Active
 
 #  ~~~~~~ Configuration ADDS ~~~~~~
 
-import-module ADDSDeployment
-install-addsforest @foret
-import-module ActiveDirectory
-import-module 'Microsoft.Powershell.Security'
+install-addsforest @foret -DomainName $domaineDNS
 
 ForEach ($ou in $agences){
     new-adorganizationalunit -Name $ou -Path "dc=XXXXXX, dc=lan"
