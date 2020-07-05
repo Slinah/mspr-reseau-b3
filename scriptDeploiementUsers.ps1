@@ -67,11 +67,11 @@ Add-DhcpServerv4Scope -Name "Bordeaux-Administratif" -StartRange 192.168.10.1 -E
 Add-DhcpServerv4Scope -Name "Bordeaux-Invites" -StartRange 192.168.11.1 -EndRange 192.168.11.126 -SubnetMask 255.255.255.128 -State Active
 Add-DhcpServerv4Scope -Name "Bordeaux-Entrepots" -StartRange 192.168.12.1 -EndRange 192.168.12.126 -SubnetMask 255.255.255.128 -State Active
 
-Add-DhcpServerv4Scope -Name "Lyon-Administratif" -StartRange 192.168.20.1 -EndRange 192.168.20.126 -SubnetMask 255.255.255.128 -State Active
-Add-DhcpServerv4Scope -Name "Lyon-Invites" -StartRange 192.168.21.1 -EndRange 192.168.21.126 -SubnetMask 255.255.255.128 -State Active
+Add-DhcpServerv4Scope -Name "Lyon-Administratif" -StartRange 192.168.30.1 -EndRange 192.168.30.126 -SubnetMask 255.255.255.128 -State Active
+Add-DhcpServerv4Scope -Name "Lyon-Invites" -StartRange 192.168.31.1 -EndRange 192.168.31.126 -SubnetMask 255.255.255.128 -State Active
 
-Add-DhcpServerv4Scope -Name "Marseille-Administratif" -StartRange 192.168.20.1 -EndRange 192.168.20.126 -SubnetMask 255.255.255.128 -State Active
-Add-DhcpServerv4Scope -Name "Marseille-Invites" -StartRange 192.168.21.1 -EndRange 192.168.21.126 -SubnetMask 255.255.255.128 -State Active
+Add-DhcpServerv4Scope -Name "Marseille-Administratif" -StartRange 192.168.40.1 -EndRange 192.168.40.126 -SubnetMask 255.255.255.128 -State Active
+Add-DhcpServerv4Scope -Name "Marseille-Invites" -StartRange 192.168.41.1 -EndRange 192.168.41.126 -SubnetMask 255.255.255.128 -State Active
 
 #  ~~~~~~ Configuration ADDS ~~~~~~
 
