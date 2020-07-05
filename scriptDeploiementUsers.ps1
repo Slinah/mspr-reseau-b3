@@ -21,7 +21,7 @@ $foret = @{
 $ADIP = "xxx"
 $mask = "24"
 $defaultGateway = "xxx"
-$DNS = @("AD-Domain-Services","DNS", "DHCP")
+$install = @("AD-Domain-Services","DNS", "DHCP", "FS-DFS-namespace", "RSAT-DFS-Mgmt-Con")
 $defaultPassword = "XXXXXXDefaultPassword"
 $defaultDirectory = "\\server\home$\"
 
@@ -44,7 +44,7 @@ import-module 'Microsoft.Powershell.Security'
 # Install-WindowsFeature DHCP -IncludeManagementTools
 # Install-WindowsFeature AD-Domain-Services -IncludeManagementTools
 
-ForEach ($function in $DNS){
+ForEach ($function in $install){
     if ((( Get-WindowsFeature -name $function).installstate) -eq "Available"){
         try {
             Install-WindowsFeature -name $function -includemanagementtools -includeallsubfeature
@@ -56,7 +56,7 @@ ForEach ($function in $DNS){
 
 #  ~~~~~~ Configuration DNS ~~~~~~
 
-Add-DnsServerPrimaryZone -Name $domaineDNS -ReplicationScope "Forest" -DynamicUpdate UPDATE_TYPE
+Add-DnsServerPrimaryZone -Name $domaineDNS -ReplicationScope "Forest" 
 
 #  ~~~~~~ Configuration DHCP ~~~~~~
 
@@ -90,10 +90,11 @@ ForEach ($ou in $agences){
             $directory = $defaultDirectory + $all.Prénom
             New-Item -Path $directory -Type Directory -Force
             set-aduser $all.Prénom.$all.Nom -homedrive "C:" -homedirectory "/user/" + $all.Prénom
-            # add-groupmember -identify $g -member $l.$l
-            # net user "$n 1" /times:M,8AM-8PM,F,8AM-8PM
         } else {
             Write-Host "Ne correspond pas."
         }
     }
 }
+
+#  ~~~~~~ Configuration DFS ~~~~~~
+
