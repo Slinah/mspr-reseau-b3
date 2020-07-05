@@ -22,7 +22,8 @@ $ADIP = "xxx"
 $mask = "24"
 $defaultGateway = "xxx"
 $DNS = @("AD-Domain-Services","DNS", "DHCP")
-$p = "XXXXXXDefaultPassword"
+$defaultPassword = "XXXXXXDefaultPassword"
+$defaultDirectory = "\\server\home$\"
 
 # ~~~~~~ Configuration Machine  ~~~~~~
 
@@ -55,9 +56,22 @@ ForEach ($function in $DNS){
 
 #  ~~~~~~ Configuration DNS ~~~~~~
 
+Add-DnsServerPrimaryZone -Name $domaineDNS -ReplicationScope "Forest" -DynamicUpdate UPDATE_TYPE
+
 #  ~~~~~~ Configuration DHCP ~~~~~~
 
 Add-DhcpServerv4Scope -Name "Paris-Administratif" -StartRange 192.168.20.1 -EndRange 192.168.20.126 -SubnetMask 255.255.255.0 -State Active
+Add-DhcpServerv4Scope -Name "Paris-Invites" -StartRange 192.168.20.128 -EndRange 192.168.20.254 -SubnetMask 255.255.255.0 -State Active
+
+Add-DhcpServerv4Scope -Name "Bordeaux-Administratif" -StartRange 192.168.10.1 -EndRange 192.168.10.126 -SubnetMask 255.255.255.0 -State Active
+Add-DhcpServerv4Scope -Name "Bordeaux-Invites" -StartRange 192.168.10.128 -EndRange 192.168.10.254 -SubnetMask 255.255.255.0 -State Active
+Add-DhcpServerv4Scope -Name "Bordeaux-Entrepots" -StartRange 192.168.11.1 -EndRange 192.168.11.126 -SubnetMask 255.255.255.0 -State Active
+
+Add-DhcpServerv4Scope -Name "Lyon-Administratif" -StartRange 192.168.30.1 -EndRange 192.168.30.126 -SubnetMask 255.255.255.0 -State Active
+Add-DhcpServerv4Scope -Name "Lyon-Invites" -StartRange 192.168.30.128 -EndRange 192.168.30.254 -SubnetMask 255.255.255.0 -State Active
+
+Add-DhcpServerv4Scope -Name "Marseille-Administratif" -StartRange 192.168.40.1 -EndRange 192.168.40.126 -SubnetMask 255.255.255.0 -State Active
+Add-DhcpServerv4Scope -Name "Marseille-Invites" -StartRange 192.168.40.128 -EndRange 192.168.40.254 -SubnetMask 255.255.255.0 -State Active
 
 #  ~~~~~~ Configuration ADDS ~~~~~~
 
@@ -72,17 +86,14 @@ ForEach ($ou in $agences){
             new-adgroup -Name "gp_$service" -GroupScope DomainLocal -GroupCategory Security -Path "ou=$service, ou=$ou, dc=XXXXXX, dc=lan"
             set-adorganizationalunit -ProtectedFromAccidentalDeletion $true
 
-            new-aduser -name $all.Prénom -SamAccoutName $all. -userprincipalname "$n 1" -accountpassword (ConvertTo-SecureString $p -AsPlainText -Force) -path $p
-            New-Item -Path $hd -Type Directory -Force
-            set-aduser $l.$l -homedrive "C:" -homedirectory "$HomeDirectory"
-            add-groupmember -identify $g -member $l.$l
-         net user "$n 1" /times:M,8AM-8PM,F,8AM-8PM
+            new-aduser -name $all.Prénom -SamAccoutName $all.Prénom -userprincipalname $all.Nom -accountpassword (ConvertTo-SecureString $defaultPassword -AsPlainText -Force) -path "ou=$service, ou=$ou, dc=XXXXXX, dc=lan"
+            $directory = $defaultDirectory + $all.Prénom
+            New-Item -Path $directory -Type Directory -Force
+            set-aduser $all.Prénom.$all.Nom -homedrive "C:" -homedirectory "/user/" + $all.Prénom
+            # add-groupmember -identify $g -member $l.$l
+            # net user "$n 1" /times:M,8AM-8PM,F,8AM-8PM
         } else {
             Write-Host "Ne correspond pas."
         }
     }
 }
-
-# ForEach ($data in $agences){
-#     Write-Host $data
-# }
