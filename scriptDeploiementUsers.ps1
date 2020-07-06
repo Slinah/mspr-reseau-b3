@@ -79,6 +79,7 @@ install-addsforest @foret -DomainName $domaineDNS
 
 ForEach ($ou in $agences){
     new-adorganizationalunit -Name $ou -Path "dc=XXXXXX, dc=lan"
+    New-SmbShare -Name "Partage-$ou" -Path "C:\Partage"
     ForEach ($all in $csv){
         if ($ou -eq $all.Agence){
             $service = $all.Service
@@ -95,6 +96,4 @@ ForEach ($ou in $agences){
         }
     }
 }
-
-#  ~~~~~~ Configuration DFS ~~~~~~
 
